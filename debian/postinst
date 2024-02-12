@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    install|configure)
+        if  [ ! -f /etc/linuxmuster/tools/linuxmuster-sophosxgs-sync/config.yml ] ; then
+            cat << EOF > /etc/linuxmuster/tools/linuxmuster-sophosxgs-sync/config.yml
+url: 
+port: 
+username: 
+password: 
+EOF
+        fi
+    ;;
+    upgrade|abort-upgrade)
+    ;;
+    
+    *)
+        msg "postinst called with unknown argument \`$1'" >&2
+        exit 0
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

@@ -34,6 +34,13 @@ def decryptPassword(password):
     except Exception as e:
         print("ERROR: Failed to decrypt password in config! " + str(e))
 
+def getSambaDomain():
+    with open("/var/lib/linuxmuster/setup.ini") as f:
+        for line in f.readlines():
+            if "domainname" in line:
+                return line.split("=")[1].strip()
+    return "linuxmuster.lan"
+
 
 def main():
     parameters = sys.argv
@@ -51,25 +58,26 @@ def main():
         users = [users]
 
     config = readConfigFile()
+    sambadomain = getSambaDomain()
 
     api = SophosAPI(config["url"], config["port"], config["username"], decryptPassword(config["password"]))
 
     group_list = []
     groups = api.get(SophosAPIType.USERGROUP)
     for group in groups.get()["GroupDetail"]:
-        group_list.append(group["Name"].replace(GROUPNAME_PREFIX, ""))
+        group_list.append(group["Name"])
 
     if groupname in group_list:
         if action == "add":
             for user in users:
-                res = api.update(SophosAPIType.USER, SophosAPIType_User(user, user, groupname))
+                res = api.update(SophosAPIType.USER, SophosAPIType_User(user + "@" + sambadomain, user + "@" + sambadomain, groupname))
                 if res.getStatus():
                     print(f"User '{user}' successfully added to group '{groupname}'")
                 else:
                     print(f"[ERROR] Could not add user '{user}' to group '{groupname}'")
         elif action == "remove":
             for user in users:
-                res = api.update(SophosAPIType.USER, SophosAPIType_User(user, user, XGS_FALLBACK_GROUP))
+                res = api.update(SophosAPIType.USER, SophosAPIType_User(user + "@" + sambadomain, user + "@" + sambadomain, XGS_FALLBACK_GROUP))
                 if res.getStatus():
                     print(f"User '{user}' successfully removed from group '{groupname}'")
                 else:

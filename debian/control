@@ -6,6 +6,6 @@ Build-Depends: debhelper (>= 4.0.0), fakeroot
 
 Package: linuxmuster-sophosxgs-sync
 Architecture: all
-Depends: linuxmuster-tools7, linuxmuster-webui7, python3-cryptography, python3-pyyaml, python3-sophosxgs
+Depends: linuxmuster-tools7, linuxmuster-webui7, python3-cryptography, python3-sophosxgs
 Homepage: www.netzint.de
 Description: Sync groupchanges via api directly to sophosxgs.

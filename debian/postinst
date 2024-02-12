@@ -3,12 +3,13 @@ set -e
 
 case "$1" in
     install|configure)
-        if  [ ! -f /etc/linuxmuster/tools/linuxmuster-sophosxgs-sync/config.yml ] ; then
-            cat << EOF > /etc/linuxmuster/tools/linuxmuster-sophosxgs-sync/config.yml
-url: 
-port: 
-username: 
-password: 
+        if  [ ! -f /etc/linuxmuster/sophos/config.yml ] ; then
+            mkdir -p /etc/linuxmuster/sophos/
+            cat << EOF > /etc/linuxmuster/sophos/config.yml
+url:
+port:
+username:
+password:
 EOF
         fi
     ;;

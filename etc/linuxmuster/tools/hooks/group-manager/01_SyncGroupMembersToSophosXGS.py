@@ -16,12 +16,11 @@ import sys
 from cryptography.fernet import Fernet
 from sophosxgs import SophosAPI, SophosAPIType, SophosAPIType_User
 
-GROUPNAME_PREFIX = "lmn-auto-"
 XGS_FALLBACK_GROUP = "Open Group"
 
 def readConfigFile():
     try:
-        with open("/etc/linuxmuster/tools/linuxmuster-sophosxgs-sync/config.yml", "r") as f:
+        with open("/etc/linuxmuster/sophos/config.yml", "r") as f:
             config = yaml.safe_load(f)
             return config
     except Exception as e:
@@ -57,31 +56,28 @@ def main():
 
     group_list = []
     groups = api.get(SophosAPIType.USERGROUP)
-    if groups.getStatus()
-        for group in groups.get()["GroupDetail"]:
-            group_list.append(group["Name"].replace(GROUPNAME_PREFIX, ""))
-    else:
-        print("ERROR: Could not connect to XGS-Firewall. Please check credentials or firewall settings!")
+    for group in groups.get()["GroupDetail"]:
+        group_list.append(group["Name"].replace(GROUPNAME_PREFIX, ""))
 
     if groupname in group_list:
         if action == "add":
             for user in users:
-                res = api.update(SophosAPIType.USER, SophosAPIType_User(user, user, GROUPNAME_PREFIX + groupname))
+                res = api.update(SophosAPIType.USER, SophosAPIType_User(user, user, groupname))
                 if res.getStatus():
-                    print(f"User '{user}' successfully added to group '{GROUPNAME_PREFIX + groupname}'")
+                    print(f"User '{user}' successfully added to group '{groupname}'")
                 else:
-                    print(f"[ERROR] Could not add user '{user}' to group '{GROUPNAME_PREFIX + groupname}'")
+                    print(f"[ERROR] Could not add user '{user}' to group '{groupname}'")
         elif action == "remove":
             for user in users:
                 res = api.update(SophosAPIType.USER, SophosAPIType_User(user, user, XGS_FALLBACK_GROUP))
                 if res.getStatus():
-                    print(f"User '{user}' successfully removed from group '{GROUPNAME_PREFIX + groupname}'")
+                    print(f"User '{user}' successfully removed from group '{groupname}'")
                 else:
-                    print(f"[ERROR] Could not remove user '{user}' from group '{GROUPNAME_PREFIX + groupname}'")
+                    print(f"[ERROR] Could not remove user '{user}' from group '{groupname}'")
         else:
             print(f"Unknown action '{action}'!")
     else:
-        print(f"Group does not exist! Please create a new group '{GROUPNAME_PREFIX + groupname}' on your XGS-Firewall!")
+        print(f"Group does not exist! Please create a new group '{groupname}' on your XGS-Firewall!")
 
 
 

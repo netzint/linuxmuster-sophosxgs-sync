@@ -109,7 +109,10 @@ def main():
                     threading.Thread(target=createUserObjectOnXGS, args=(api, user + "@" + sambadomain, action, LMN_GROUP_PREFIX + groupname)).start()
         elif action == "remove":
             for user in users:
-                res = api.update(SophosAPIType.USER, SophosAPIType_User(user + "@" + sambadomain, user + "@" + sambadomain, XGS_FALLBACK_GROUP))
+                if LMN_GROUP_PREFIX + "no" + groupname in group_list:
+                    res = api.update(SophosAPIType.USER, SophosAPIType_User(user + "@" + sambadomain, user + "@" + sambadomain, LMN_GROUP_PREFIX + "no" + groupname))
+                else:
+                    res = api.update(SophosAPIType.USER, SophosAPIType_User(user + "@" + sambadomain, user + "@" + sambadomain, XGS_FALLBACK_GROUP))
                 if res.getStatus():
                     print(f"User '{user}' successfully removed from group '{LMN_GROUP_PREFIX + groupname}'")
                 else:

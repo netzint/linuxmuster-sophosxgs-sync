@@ -12,11 +12,15 @@ import os
 import yaml
 import base64
 import sys
+import threading
+
+sys.path.append("./usr/lib/python3/dist-packages/")
 
 from cryptography.fernet import Fernet
-from sophosxgs import SophosAPI, SophosAPIType, SophosAPIType_User
+from sophosxgs import SophosAPI, SophosAPIType, SophosAPIType_User, SophosAPIType_LiveUserLogin, SophosAPIType_LiveUserLogout
 
 XGS_FALLBACK_GROUP = "Open Group"
+LMN_GROUP_PREFIX = "lmn-auto-"
 
 def readConfigFile():
     try:
@@ -41,6 +45,32 @@ def getSambaDomain():
                 return line.split("=")[1].strip()
     return "linuxmuster.lan"
 
+def createUserObjectOnXGS(api, username, action, group):
+    res = api.request(SophosAPIType.LIVEUSERLOGIN, SophosAPIType_LiveUserLogin(username, "1.2.3.4"))
+    if res.getStatus():
+        print(f"[{username}] Live-Login successful!")
+        res = api.request(SophosAPIType.LIVEUSERLOGOUT, SophosAPIType_LiveUserLogout(username, "1.2.3.4"))
+        if res.getStatus():
+            print(f"[{username}] Live-Logout successful!")
+        else:
+            print(f"[{username}] Live-Logout failed! That's no problem. You can ignore that ;-)")
+
+        if action == "add":
+            res = api.update(SophosAPIType.USER, SophosAPIType_User(username, username, group))
+            if res.getStatus():
+                print(f"[{username}] User '{username}' successfully added to group '{group}'")
+            else:
+                print(f"[{username}] [ERROR] Could not add user '{username}' to group '{group}'")
+        elif action == "remove":
+            res = api.update(SophosAPIType.USER, SophosAPIType_User(username, username, XGS_FALLBACK_GROUP))
+            if res.getStatus():
+                print(f"[{username}] User '{username}' successfully removed from group '{group}'")
+            else:
+                print(f"[{username}] [ERROR] Could not remove user '{username}' from group '{group}'")
+    else:
+        print(f"[{username}] Live-Login failed!")
+
+
 
 def main():
     parameters = sys.argv
@@ -50,6 +80,7 @@ def main():
         users = parameters[3]
     else:
         print("ERROR: Not enought parameters given!")
+        print("./01_SyncGroupMembersToSophosXGS.py <ADD/REMOVE> <GROUPNAME> <USER(s)>")
         exit(1)
 
     if "," in users:
@@ -67,25 +98,27 @@ def main():
     for group in groups.get()["GroupDetail"]:
         group_list.append(group["Name"])
 
-    if groupname in group_list:
+    if LMN_GROUP_PREFIX + groupname in group_list:
         if action == "add":
             for user in users:
-                res = api.update(SophosAPIType.USER, SophosAPIType_User(user + "@" + sambadomain, user + "@" + sambadomain, groupname))
+                res = api.update(SophosAPIType.USER, SophosAPIType_User(user + "@" + sambadomain, user + "@" + sambadomain, LMN_GROUP_PREFIX + groupname))
                 if res.getStatus():
-                    print(f"User '{user}' successfully added to group '{groupname}'")
+                    print(f"User '{user}' successfully added to group '{LMN_GROUP_PREFIX + groupname}'")
                 else:
-                    print(f"[ERROR] Could not add user '{user}' to group '{groupname}'")
+                    print(f"[ERROR] Could not add user '{user}' to group '{LMN_GROUP_PREFIX + groupname}'. Try to create user on firewall... -> [BACKGROUND-TASK]")
+                    threading.Thread(target=createUserObjectOnXGS, args=(api, user + "@" + sambadomain, action, LMN_GROUP_PREFIX + groupname)).start()
         elif action == "remove":
             for user in users:
                 res = api.update(SophosAPIType.USER, SophosAPIType_User(user + "@" + sambadomain, user + "@" + sambadomain, XGS_FALLBACK_GROUP))
                 if res.getStatus():
-                    print(f"User '{user}' successfully removed from group '{groupname}'")
+                    print(f"User '{user}' successfully removed from group '{LMN_GROUP_PREFIX + groupname}'")
                 else:
-                    print(f"[ERROR] Could not remove user '{user}' from group '{groupname}'")
+                    print(f"[ERROR] Could not remove user '{user}' from group '{LMN_GROUP_PREFIX + groupname}'. Try to create user on firewall... -> [BACKGROUND-TASK]")
+                    threading.Thread(target=createUserObjectOnXGS, args=(api, user + "@" + sambadomain, action, LMN_GROUP_PREFIX + groupname)).start()
         else:
             print(f"Unknown action '{action}'!")
     else:
-        print(f"Group does not exist! Please create a new group '{groupname}' on your XGS-Firewall!")
+        print(f"Group does not exist! Please create a new group '{LMN_GROUP_PREFIX + groupname}' on your XGS-Firewall!")
 
 
 

@@ -72,7 +72,7 @@ install: build
 	# fixing default not being installed
 	
 	mkdir -p debian/linuxmuster-sophosxgs-sync
-	rsync -avr etc debian/linuxmuster-sophosxgs-sync
+	rsync -avr etc usr debian/linuxmuster-sophosxgs-sync
 
 # Build architecture-independent files here.
 # Pass -i to all debhelper commands in this target to reduce clutter.

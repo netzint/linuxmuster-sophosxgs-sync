@@ -1,0 +1,3 @@
+[submodule "python3-sophosxgs"]
+	path = python3-sophosxgs
+	url = https://github.com/netzint/python3-sophosxgs.git

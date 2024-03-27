@@ -1,4 +1,10 @@
-linuxmuster-sophosxgs-sync (1.0.8) lmn72-testing; urgency=medium
+linuxmuster-sophosxgs-sync (1.0.9) lmn72-testing; urgency=medium
+
+  * Now toggle userstatus
+
+ -- Lukas Spitznagel <lukas.spitznagel@netzint.de>  Tue, 27 Mar 2024 16:32:02 +0200
+ 
+ linuxmuster-sophosxgs-sync (1.0.8) lmn72-testing; urgency=medium
 
   * Now only disable user on groupchange
 

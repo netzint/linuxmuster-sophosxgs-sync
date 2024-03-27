@@ -76,7 +76,12 @@ def deactivateUsersOnXGS(api, users):
     else:
         print("Failed to deactivate user(s)!")
 
-
+def activateUsersOnXGS(api, users):
+    res = api.set(SophosAPIType.USERSTATUS, SophosAPIType_UserStatus(SophosAPIType_UserStatus.USERSTATUS_ACTIVATE, users))
+    if res.getStatus():
+        print("Successfully activate user(s)!")
+    else:
+        print("Failed to activate user(s)!")
 
 def main():
     parameters = sys.argv
@@ -103,6 +108,7 @@ def main():
 
     api = SophosAPI(config["url"], config["port"], config["username"], decryptPassword(config["password"]))
     deactivateUsersOnXGS(api, userlist)
+    activateUsersOnXGS(api, userlist)
 
     # group_list = []
     # groups = api.get(SophosAPIType.USERGROUP)

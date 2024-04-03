@@ -53,7 +53,7 @@ def main():
     for user in users:
         userlist.append(user + "@" + sambadomain)
 
-    api = SophosAPI(config["url"], config["port"], config["username"], decryptPassword(config["password"]))
+    api = SophosAPI(config["url"], config["port"], config["username"], config["password"])
     api.toggle(SophosAPIType.USERSTATUS, SophosAPIType_UserStatus(SophosAPIType_UserStatus.USERSTATUS_DEACTIVATE, userlist), SophosAPIType_UserStatus(SophosAPIType_UserStatus.USERSTATUS_ACTIVATE, userlist))
 
 if __name__ == "__main__":

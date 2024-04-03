@@ -55,6 +55,8 @@ def main():
 
     api = SophosAPI(config["url"], config["port"], config["username"], config["password"])
     api.toggle(SophosAPIType.USERSTATUS, SophosAPIType_UserStatus(SophosAPIType_UserStatus.USERSTATUS_DEACTIVATE, userlist), SophosAPIType_UserStatus(SophosAPIType_UserStatus.USERSTATUS_ACTIVATE, userlist))
+    userliststring = ",".join(userlist)
+    print(f"Successfully toggled users '{userliststring}'!")
 
 if __name__ == "__main__":
     start_time = time.time()

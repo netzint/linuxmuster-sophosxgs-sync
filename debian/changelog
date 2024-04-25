@@ -1,3 +1,9 @@
+linuxmuster-sophosxgs-sync (1.1.1) lmn72-testing; urgency=medium
+
+  * Add output and fix problem with SophosAPI password decryption
+
+ -- Lukas Spitznagel <lukas.spitznagel@netzint.de>  Tue, 25 Apr 2024 16:32:02 +0200
+
 linuxmuster-sophosxgs-sync (1.1.0) lmn72-testing; urgency=medium
 
   * Now toggle userstatus

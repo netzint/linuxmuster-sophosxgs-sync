@@ -49,14 +49,12 @@ def main():
     config = readConfigFile()
     sambadomain = getSambaDomain()
 
-    userlist = []
-    for user in users:
-        userlist.append(user + "@" + sambadomain)
-
     api = SophosAPI(config["url"], config["port"], config["username"], config["password"])
-    api.toggle(SophosAPIType.USERSTATUS, SophosAPIType_UserStatus(SophosAPIType_UserStatus.USERSTATUS_DEACTIVATE, userlist), SophosAPIType_UserStatus(SophosAPIType_UserStatus.USERSTATUS_ACTIVATE, userlist))
-    userliststring = ",".join(userlist)
-    print(f"Successfully toggled users '{userliststring}'!")
+
+    for user in users:
+        userlist = [user + "@" + sambadomain]
+        api.toggle(SophosAPIType.USERSTATUS, SophosAPIType_UserStatus(SophosAPIType_UserStatus.USERSTATUS_DEACTIVATE, userlist), SophosAPIType_UserStatus(SophosAPIType_UserStatus.USERSTATUS_ACTIVATE, userlist))
+        print(f"Successfully toggled users '{userlist[0]}'!")
 
 if __name__ == "__main__":
     start_time = time.time()

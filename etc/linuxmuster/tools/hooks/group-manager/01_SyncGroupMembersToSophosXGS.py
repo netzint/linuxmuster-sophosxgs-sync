@@ -15,7 +15,13 @@ import time
 
 from sophosxgs import SophosAPI, SophosAPIType, SophosAPIType_UserStatus
 
-def readConfigFile():
+def readConfigFile(school: str = ""):
+    configStr = "/etc/linuxmuster/sophos/"
+    if school == "":
+        configStr += "config.yml"
+    else:
+        configStr += f"{school}.config.yml"
+        
     try:
         with open("/etc/linuxmuster/sophos/config.yml", "r") as f:
             config = yaml.safe_load(f)
@@ -46,7 +52,12 @@ def main():
     else:
         users = [users]
 
-    config = readConfigFile()
+    if "-" in groupname:
+        school = groupname.split("-", 1)[0]
+        config = readConfigFile(school)
+    else:
+        config = readConfigFile()
+        
     sambadomain = getSambaDomain()
 
     api = SophosAPI(config["url"], config["port"], config["username"], config["password"])
